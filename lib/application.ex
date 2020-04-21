@@ -7,7 +7,8 @@ defmodule EventDemo.Application do
     Logger.info("Application starting ...")
 
     children = [
-      {Plug.Cowboy, scheme: :http, plug: EventDemo.HttpServer, options: [port: 4001]}
+      {Plug.Cowboy, scheme: :http, plug: EventDemo.HttpServer, options: [port: 4001]},
+      {EventDemo.Deamon.EventService, []}
     ]
 
     opts = [
