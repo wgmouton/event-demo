@@ -1,8 +1,10 @@
 {application,eventdemo,
-             [{applications,[kernel,stdlib,elixir,logger]},
+             [{applications,[kernel,stdlib,elixir,logger,plug_cowboy]},
               {description,"eventdemo"},
-              {modules,['Elixir.EventDemo.Connector.AWS',
+              {modules,['Elixir.EventDemo.Application',
+                        'Elixir.EventDemo.Connector.AWS',
                         'Elixir.EventDemo.Deamon.EventService',
-                        'Elixir.Eventdemo','Elixir.HttpServer']},
+                        'Elixir.EventDemo.HttpServer']},
               {registered,[]},
-              {vsn,"0.1.0"}]}.
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.EventDemo.Application',[]}}]}.

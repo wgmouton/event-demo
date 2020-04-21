@@ -3,12 +3,12 @@ defmodule EventDemo.Deamon.EventService do
 
   alias EventDemo.Connector.AWS
 
-  defp test do
-    :ok
-  end
-
   def post_topic(payload) do
     GenServer.call({:post, payload}, __MODULE__)
+  end
+
+  def check_health() do
+    GenServer.call(:health_check, __MODULE__)
   end
 
   def handle_call(_message, _from, %{status: :starting}) do
@@ -19,21 +19,39 @@ defmodule EventDemo.Deamon.EventService do
     {:error, "The cluster has not yet started."}
   end
 
-  def handle_call({:post, payload}, {pid, ref}, %{status: :healthy}) do
+  def handle_call({:post, payload}, {pid, ref}, %{status: :healthy} = state) do
     spawn_link(fn ->
+      response =
+        with :ok <- AWS.post_topic() do
+          %{}
+        end
 
+      send(pid, {ref, response})
+    end)
 
-      with :ok <- AWS.post_topic
-      result = %{}
+    {:noreply, state}
+  end
 
+  def handle_call(:health_check, {pid, ref}, %{status: :healthy} = state) do
+    spawn_link(fn ->
+      response =
+        with :ok <- AWS.check_health() do
+          %{}
+        end
 
-      send(pid, {ref, result})
+      send(pid, {ref, response})
     end)
 
     {:noreply, state}
   end
 
   def handle_continue(_continue, %{status: :dead}) do
+    with :ok <- AWS.create_kafka(),
+         :ok <- AWS.check_health() do
+      {:noreply, %{status: :healthy}}
+    else
+      _ -> {:stop, "Unable to start kafka. Trying to recreate node"}
+    end
   end
 
   def handle_continue(_continue, %{status: :healthy} = state) do
@@ -45,6 +63,7 @@ defmodule EventDemo.Deamon.EventService do
   end
 
   def start_link(_int) do
+    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
   def init(_int) do
