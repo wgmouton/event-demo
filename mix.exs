@@ -15,7 +15,7 @@ defmodule EventDemo.MixProject do
   def application do
     [
       mod: {EventDemo.Application, []},
-      extra_applications: [:logger, :kaffe]
+      extra_applications: [:logger, :kafka_ex, :snappy ]
 
     ]
   end
@@ -24,7 +24,8 @@ defmodule EventDemo.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:kaffe, "~> 1.0"}
+      {:kafka_ex, "~> 0.10"},
+      {:snappy, git: "https://github.com/fdmanana/snappy-erlang-nif"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

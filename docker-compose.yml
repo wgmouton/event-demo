@@ -13,6 +13,10 @@ services:
       - app-tier
   kafka:
     image: 'bitnami/kafka:latest'
+    depends_on:
+      - zookeeper
+    volumes:
+      - './kafka:/bitnami/kafka/config'
     environment:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
