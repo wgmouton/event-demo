@@ -64,15 +64,6 @@ defmodule EventDemo.Deamon.EventService do
 
     IO.inspect(pid)
 
-    # KafkaEx.create_topics()
-    {:ok, test} = KafkaEx.produce(%KafkaEx.Protocol.Produce.Request{topic: "foo",  compression: :snappy, messages: [%KafkaEx.Protocol.Produce.Message{value: "hey"}]}, worker_name: :pr)
-    IO.inspect(test)
-
-    IO.inspect("hi")
-    KafkaEx.stream("foo", 0, offset: 0) |> Enum.take(2) |> IO.inspect()
-
-    IO.inspect("bye")
-
     with :ok <- AWS.check_health() do
       {:noreply, state}
     else
@@ -86,20 +77,6 @@ defmodule EventDemo.Deamon.EventService do
 
   def init(_int) do
     Logger.info("start event service")
-
-    {:ok, pid} = KafkaEx.create_worker(:pr, uris: [{"localhost", 9092}])
-
-    IO.inspect(pid)
-
-    # KafkaEx.create_topics()
-    {:ok, test} = KafkaEx.produce(%KafkaEx.Protocol.Produce.Request{topic: "foo",  compression: :snappy, messages: [%KafkaEx.Protocol.Produce.Message{value: "hey"}]}, worker_name: :pr)
-    IO.inspect(test)
-
-    IO.inspect("hi")
-    KafkaEx.stream("foo", 0, offset: 0, worker_name: :pr) |> Enum.take(2) |> IO.inspect()
-
-    IO.inspect("bye")
-
 
     {:ok, %{status: :dead}, {:continue, :start}}
   end
